@@ -1,0 +1,31 @@
+from __future__ import print_function
+
+# Variables Used
+sharedPrime = 71    # p
+sharedBase = 7      # g
+aliceSecret = 5     # a
+bobSecret = 12      # b
+
+# Begin
+print("Publicly Shared Variables:")
+print("    Publicly Shared Prime: ", sharedPrime)
+print("    Publicly Shared Base:  ", sharedBase)
+
+# Alice Sends Bob A = g^a mod p
+A = (sharedBase ** aliceSecret) % sharedPrime
+print("\nAlice Sends Over Public Channel: ", A)
+
+# Bob Sends Alice B = g^b mod p
+B = (sharedBase ** bobSecret) % sharedPrime
+print("Bob Sends Over Public Channel: ", B)
+
+print("\n------------\n")
+print("Privately Calculated Shared Secret:")
+
+# Alice Computes Shared Secret: s = B^a mod p
+aliceSharedSecret = (B ** aliceSecret) % sharedPrime
+print("    Alice Shared Secret: ", aliceSharedSecret)
+
+# Bob Computes Shared Secret: s = A^b mod p
+bobSharedSecret = (A ** bobSecret) % sharedPrime
+print("    Bob Shared Secret: ", bobSharedSecret)

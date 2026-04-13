@@ -1,0 +1,196 @@
+import random
+
+
+# Decimal to binary conversion
+def dec2bin(num):
+    res = bin(num).replace("0b", "")
+    if len(res) % 4 != 0:
+        div = len(res) / 4
+        div = int(div)
+        counter = (4 * (div + 1)) - len(res)
+        for i in range(0, counter):
+            res = "0" + res
+    return res
+
+
+# Permute function to rearrange the bits
+def permute(k, arr, n):
+    permutation = ""
+    for i in range(0, n):
+        permutation = permutation + k[arr[i] - 1]
+    return permutation
+
+
+# shifting the bits towards left by nth shifts
+def shift_left(k, nth_shifts):
+    s = ""
+    for i in range(nth_shifts):
+        for j in range(1, len(k)):
+            s = s + k[j]
+        s = s + k[0]
+        k = s
+        s = ""
+    return k
+
+
+# calculating xor of two strings of binary number a and b
+def xor(a, b):
+    ans = ""
+    for i in range(len(a)):
+        if a[i] == b[i]:
+            ans = ans + "0"
+        else:
+            ans = ans + "1"
+    return ans
+
+
+# Table of Position of 64 bits at initial level: Initial Permutation Table
+initial_perm = [
+    58, 50, 42, 34, 26, 18, 10, 2,
+    60, 52, 44, 36, 28, 20, 12, 4,
+    62, 54, 46, 38, 30, 22, 14, 6,
+    64, 56, 48, 40, 32, 24, 16, 8,
+    57, 49, 41, 33, 25, 17, 9, 1,
+    59, 51, 43, 35, 27, 19, 11, 3,
+    61, 53, 45, 37, 29, 21, 13, 5,
+    63, 55, 47, 39, 31, 23, 15, 7
+]
+
+exp_d = []
+for i in range(48):
+    exp_d.append(random.choice(range(1, 33)))
+
+per = []
+for i in range(32):
+    per.append(random.choice(range(1, 33)))
+
+sbox = [[], [], [], [], [], [], [], []]
+for i in range(len(sbox)):
+    for j in range(4):
+        sbox[i].append(random.sample(range(16), 16))
+
+# Final Permutation Table
+final_perm = [
+    40, 8, 48, 16, 56, 24, 64, 32,
+    39, 7, 47, 15, 55, 23, 63, 31,
+    38, 6, 46, 14, 54, 22, 62, 30,
+    37, 5, 45, 13, 53, 21, 61, 29,
+    36, 4, 44, 12, 52, 20, 60, 28,
+    35, 3, 43, 11, 51, 19, 59, 27,
+    34, 2, 42, 10, 50, 18, 58, 26,
+    33, 1, 41, 9, 49, 17, 57, 25
+]
+
+
+# final_perm = initial_perm = random.sample(range(1, 65), 64)
+def encrypt(pt, rkb, rk):
+    pt = dec2bin(int(pt, 16))
+
+    # Initial Permutation
+    pt = permute(pt, initial_perm, 64)
+    print("After initial permutation", hex(int(pt, 2)))
+
+    # Splitting
+    left = pt[0:32]
+    right = pt[32:64]
+
+    for i in range(0, 16):
+        # Expansion D-box: Expanding the 32 bits data into 48 bits
+        right_expanded = permute(right, exp_d, 48)
+
+        # XOR RoundKey[i] and right_expanded
+        xor_x = xor(right_expanded, rkb[i])
+
+        # S-boxes
+        sbox_str = ""
+        for j in range(0, 8):
+            row = int(xor_x[j * 6] + xor_x[j * 6 + 5], 2)
+            col = int(
+                xor_x[j * 6 + 1]
+                + xor_x[j * 6 + 2]
+                + xor_x[j * 6 + 3]
+                + xor_x[j * 6 + 4],
+                2,
+            )
+            val = sbox[j][row][col]
+            sbox_str = sbox_str + dec2bin(val)
+
+        # Straight D-box
+        sbox_str = permute(sbox_str, per, 32)
+
+        # XOR left and sbox_str
+        result = xor(left, sbox_str)
+        left = result
+
+        # Swapper
+        if i != 15:
+            left, right = right, left
+
+        print(
+            "Round ", i + 1, " ", hex(int(left, 2)), " ", hex(int(right, 2)), " ", rk[i]
+        )
+
+    # Combination
+    combine = left + right
+
+    # Final permutation
+    cipher_text = permute(combine, final_perm, 64)
+    return cipher_text
+
+
+pt = "0x123456ABCD132536"
+key = "0xAABB09182736CCDD"
+
+print(pt)
+
+# Key generation
+# --hex to binary
+key = dec2bin(int(key, 16))
+
+# --parity bit drop table
+keyp = random.sample(range(1, 64), 56)
+
+# getting 56 bit key from 64 bit using the parity bits
+key = permute(key, keyp, 56)
+
+# Number of bit shifts
+shift_table = [1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1]
+
+# Key- Compression Table
+key_comp = random.sample(range(1, 56), 48)
+
+print(len(key_comp), max(key_comp))
+
+# Splitting
+left = key[0:28]
+right = key[28:56]
+
+# rkb for RoundKeys in binary
+# rk for RoundKeys in hexadecimal
+rkb = []
+rk = []
+
+for i in range(0, 16):
+    # Shifting the bits
+    left = shift_left(left, shift_table[i])
+    right = shift_left(right, shift_table[i])
+
+    # Combination of left and right string
+    combine_str = left + right
+
+    # Compression of key
+    round_key = permute(combine_str, key_comp, 48)
+
+    rkb.append(round_key)
+    rk.append(hex(int(round_key, 2)).removeprefix("0x"))
+
+print("Encryption")
+cipher_text = hex(int(encrypt(pt, rkb, rk), 2))
+print("Cipher Text : ", cipher_text)
+
+print("Decryption")
+rkb_rev = rkb[::-1]
+rk_rev = rk[::-1]
+
+text = hex(int(encrypt(cipher_text, rkb_rev, rk_rev), 2))
+print("Plain Text : ", text)

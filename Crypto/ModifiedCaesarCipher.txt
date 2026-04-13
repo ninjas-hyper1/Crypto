@@ -1,0 +1,27 @@
+def modified_caesar_cipher_encrypt(text, key):
+    encrypted_text = ""
+    for char in text:
+        if char.isalpha():
+            if char.islower():
+                encrypted_text += chr(((ord(char) - ord('a') + key) % 26) + ord('a'))
+            elif char.isupper():
+                encrypted_text += chr(((ord(char) - ord('A') + key) % 26) + ord('A'))
+        else:
+            encrypted_text += char
+    return encrypted_text
+
+
+def modified_caesar_cipher_decrypt(text, key):
+    return modified_caesar_cipher_encrypt(text, -key)
+
+
+# Example usage:
+text = "Hello, World!"
+key = 5
+
+encrypted_text = modified_caesar_cipher_encrypt(text, key)
+decrypted_text = modified_caesar_cipher_decrypt(encrypted_text, key)
+
+print("Original text:", text)
+print("Encrypted text:", encrypted_text)
+print("Decrypted text:", decrypted_text)
