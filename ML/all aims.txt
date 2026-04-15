@@ -1,0 +1,27 @@
+1.Find probability density function or probability mass function, cumulative distribution function and joint distribution function to calculate probabilities and quantiles for standard statistical distributions.
+
+2. Aim: Find cumulative distribution function and joint distribution function to calculate probabilities and quantiles for standard statistical distributions.
+
+3.Aim: Create a Directed Acyclic Graph (DAG) using set of formulae. Find parents and children of nodes. Read conditional independence from DAG. Add and remove edges from graph.
+
+4.Aim: Create a Directed Acyclic Graph (DAG) using set of vectors. Find parents and children of nodes. Read conditional independence from DAG. Add and remove edges from graph.
+
+5. Aim: Create a Directed Acyclic Graph (DAG) using set of matrices. Find parents and children of nodes. Read conditional independence from DAG. Add and remove edges from graph.
+
+6. Aim: Create a Bayesian network for a given narrative. Set findings and ask queries [One may use narratives like ‘chest clinic narrative’ and package gRain for the purpose].
+
+7. Aim: Implement EM algorithm.
+
+8. Aim: Use string kernel to find the similarity of two amino acid sequences where similarity is defined as the number of a substring in common.
+
+9. Aim: Demonstrate SVM as a binary classifier.
+
+10. Aim: Create a random graph and find its page rank.
+
+11. Aim: Apply random walk technique to a multivariate time series.
+
+12. Aim: Implement a two stage Gibbs Sampler.
+
+13. Aim:Implement Metropolis-Hastings Algorithm.
+
+14. Aim Demonstrate Filtering Techniques.
